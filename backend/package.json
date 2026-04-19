@@ -1,0 +1,15 @@
+{
+  "name": "sistemadeinventario-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend base do sistema de inventario Atlas",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "inventory:daily": "node src/jobs/inventoryDailyUpdate.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -81,6 +81,10 @@ Retorna cobertura baseada em dominio principal.
 
 Retorna ou recalcula recomendacao operacional.
 
+### POST /api/v2/inventario/endpoints/:id/preparar-agente
+
+Prepara a fila de implantacao de agente ACME ou agente interno.
+
 ## Deployment Queue
 
 ### GET /api/v2/inventario/implantacao/fila
@@ -90,4 +94,28 @@ Lista fila de implantacao.
 ### PATCH /api/v2/inventario/implantacao/:id/status
 
 Atualiza status da fila.
+
+## Jobs
+
+### GET /api/v2/inventario/jobs
+
+Lista jobs do orquestrador.
+
+## Agents
+
+### POST /api/v2/agents/register
+
+Registra um agente interno ou agente ACME.
+
+### POST /api/v2/agents/heartbeat
+
+Recebe heartbeat outbound do agente.
+
+### POST /api/v2/agents/poll
+
+Entrega tarefas pendentes para o agente.
+
+### POST /api/v2/agents/jobs/:id/report
+
+Recebe resultado de job executado pelo agente.
 

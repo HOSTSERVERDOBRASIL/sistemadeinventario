@@ -62,7 +62,7 @@ Esse fluxo foi pensado para rodar discovery, recalcular cobertura e enviar um re
 
 ## Proxima etapa
 
-1. definir stack exata do repositorio
-2. importar modulo atual de inventario
-3. alinhar auth compartilhada
-4. construir cobertura por certificado
+1. alinhar persistencia real com banco
+2. conectar auth compartilhada com Atlas
+3. plugar worker externo real e agente interno real
+4. importar modulo atual de inventario
