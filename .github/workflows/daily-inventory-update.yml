@@ -1,0 +1,33 @@
+name: Daily Inventory Update
+
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+jobs:
+  inventory-update:
+    name: Run daily inventory update
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ./backend
+
+      - name: Run daily inventory refresh
+        run: npm run inventory:daily
+        working-directory: ./backend
+        env:
+          INVENTARIO_API_URL: ${{ secrets.INVENTARIO_API_URL }}
+          INVENTARIO_API_TOKEN: ${{ secrets.INVENTARIO_API_TOKEN }}
+          INVENTARIO_COMPANY_ID: ${{ secrets.INVENTARIO_COMPANY_ID }}
+          INVENTARIO_NOTIFICATION_WEBHOOK: ${{ secrets.INVENTARIO_NOTIFICATION_WEBHOOK }}
