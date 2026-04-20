@@ -1,8 +1,13 @@
+const crypto = require("crypto");
+const { signJob } = require("../lib/security");
+const { isJobAllowed } = require("../policies/jobPolicy");
+
 class OrchestratorService {
-  constructor(repository, inventoryService, coverageService) {
+  constructor(repository, inventoryService, coverageService, config) {
     this.repository = repository;
     this.inventoryService = inventoryService;
     this.coverageService = coverageService;
+    this.config = config;
   }
 
   createJob(companyId, payload) {
@@ -16,12 +21,15 @@ class OrchestratorService {
       status: "queued",
       priority: payload.priority || "normal",
       assignedAgentId: payload.assignedAgentId || null,
+      nonce: crypto.randomBytes(12).toString("hex"),
+      signature: null,
       createdAt: new Date().toISOString(),
       startedAt: null,
       finishedAt: null,
       result: null
     };
 
+    job.signature = signJob(job, this.config.jobSigningSecret);
     state.jobs.push(job);
     this.repository.save();
     return job;
@@ -31,7 +39,7 @@ class OrchestratorService {
     return this.repository.getState().jobs.filter((item) => item.companyId === companyId);
   }
 
-  getPendingJobsForAgent(companyId, agentId, zone) {
+  getPendingJobsForAgent(companyId, agent) {
     const state = this.repository.getState();
 
     return state.jobs.filter((job) => {
@@ -39,12 +47,27 @@ class OrchestratorService {
         return false;
       }
 
-      if (job.assignedAgentId && job.assignedAgentId !== agentId) {
+      if (job.assignedAgentId && job.assignedAgentId !== agent.id) {
         return false;
       }
 
-      return job.zone === zone || job.zone === "ANY";
-    });
+      return isJobAllowed(agent, job);
+    }).map((job) => ({
+      id: job.id,
+      companyId: job.companyId,
+      type: job.type,
+      zone: job.zone,
+      target: job.target,
+      priority: job.priority,
+      assignedAgentId: job.assignedAgentId,
+      nonce: job.nonce,
+      signature: job.signature,
+      createdAt: job.createdAt
+    }));
+  }
+
+  getJob(jobId) {
+    return this.repository.getState().jobs.find((item) => item.id === jobId) || null;
   }
 
   completeJob(jobId, result) {
@@ -147,6 +170,22 @@ class OrchestratorService {
     item.updatedAt = new Date().toISOString();
     this.repository.save();
     return item;
+  }
+
+  startJob(jobId) {
+    const job = this.getJob(jobId);
+
+    if (!job) {
+      return null;
+    }
+
+    if (job.status === "queued") {
+      job.status = "in_progress";
+      job.startedAt = new Date().toISOString();
+      this.repository.save();
+    }
+
+    return job;
   }
 
   runDailyUpdate(companyId) {

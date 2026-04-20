@@ -226,7 +226,18 @@ const routes = [
     path: "/api/v2/agents/register",
     handler: withErrorHandling(async (req, res) => {
       const body = await parseBody(req);
-      sendJson(res, 201, container.agentService.registerAgent(companyId, body));
+      const agent = container.agentService.registerAgent(companyId, body);
+      sendJson(res, 201, {
+        id: agent.id,
+        companyId: agent.companyId,
+        name: agent.name,
+        zone: agent.zone,
+        type: agent.type,
+        supportsAcme: agent.supportsAcme,
+        allowedJobTypes: agent.allowedJobTypes,
+        allowedZones: agent.allowedZones,
+        token: agent.token
+      });
     })
   },
   {
@@ -239,7 +250,13 @@ const routes = [
         sendJson(res, 401, { error: "Agent token invalid" });
         return;
       }
-      sendJson(res, 200, container.agentService.heartbeat(agent.id, body));
+      sendJson(res, 200, {
+        agent: container.agentService.heartbeat(agent.id, body),
+        policy: {
+          allowedJobTypes: agent.allowedJobTypes,
+          allowedZones: agent.allowedZones
+        }
+      });
     })
   },
   {

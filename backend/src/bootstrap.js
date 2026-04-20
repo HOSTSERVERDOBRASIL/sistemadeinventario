@@ -10,8 +10,8 @@ function createContainer() {
   const repository = new StateRepository(config.dataFile);
   const inventoryService = new InventoryService(repository);
   const coverageService = new CoverageService(repository, inventoryService);
-  const orchestratorService = new OrchestratorService(repository, inventoryService, coverageService);
-  const agentService = new AgentService(repository, orchestratorService);
+  const orchestratorService = new OrchestratorService(repository, inventoryService, coverageService, config);
+  const agentService = new AgentService(repository, orchestratorService, config);
   const acmeService = new AcmeService(repository, orchestratorService, inventoryService);
 
   return {

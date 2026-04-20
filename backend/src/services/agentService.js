@@ -1,7 +1,11 @@
+const { signJob, safeEqual } = require("../lib/security");
+const { getAllowedJobTypes, getAllowedZones, isJobAllowed } = require("../policies/jobPolicy");
+
 class AgentService {
-  constructor(repository, orchestratorService) {
+  constructor(repository, orchestratorService, config) {
     this.repository = repository;
     this.orchestratorService = orchestratorService;
+    this.config = config;
   }
 
   listAgents(companyId) {
@@ -19,6 +23,8 @@ class AgentService {
       type: payload.type || "ACME_INTERNAL_AGENT",
       status: "online",
       supportsAcme: payload.supportsAcme !== false,
+      allowedJobTypes: payload.allowedJobTypes || getAllowedJobTypes(payload.type || "ACME_INTERNAL_AGENT"),
+      allowedZones: payload.allowedZones || getAllowedZones(payload.type || "ACME_INTERNAL_AGENT"),
       lastHeartbeatAt: new Date().toISOString()
     };
 
@@ -56,7 +62,7 @@ class AgentService {
 
     return {
       agent,
-      jobs: this.orchestratorService.getPendingJobsForAgent(agent.companyId, agent.id, agent.zone)
+      jobs: this.orchestratorService.getPendingJobsForAgent(agent.companyId, agent)
     };
   }
 
@@ -67,6 +73,29 @@ class AgentService {
     if (!agent) {
       return null;
     }
+
+    const job = this.orchestratorService.getJob(jobId);
+
+    if (!job || job.companyId !== agent.companyId) {
+      return null;
+    }
+
+    if (!isJobAllowed(agent, job)) {
+      throw new Error("Agent is not authorized to execute this job");
+    }
+
+    if (job.assignedAgentId && job.assignedAgentId !== agent.id) {
+      throw new Error("Job assigned to another agent");
+    }
+
+    const expectedSignature = signJob(job, this.config.jobSigningSecret);
+    const suppliedSignature = payload.jobSignature || "";
+
+    if (!safeEqual(expectedSignature, suppliedSignature)) {
+      throw new Error("Invalid job signature");
+    }
+
+    this.orchestratorService.startJob(jobId);
 
     if (Array.isArray(payload.discoveredItems) && payload.discoveredItems.length > 0) {
       this.orchestratorService.registerDiscoveryResult(agent.companyId, {

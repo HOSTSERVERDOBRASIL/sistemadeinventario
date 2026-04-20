@@ -46,6 +46,9 @@ Esta base ja foi iniciada com:
 - API de agente interno
 - preparacao de agente ACME
 - job `inventory:daily`
+- whitelist de jobs por tipo de agente
+- assinatura HMAC dos jobs enviados ao agente
+- validacao de zona e escopo antes de aceitar `report`
 
 ## Como executar
 
