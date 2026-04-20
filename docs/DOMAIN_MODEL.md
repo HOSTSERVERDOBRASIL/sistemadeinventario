@@ -14,10 +14,16 @@
 
 - id
 - companyId
+- rootCode
+- rootLabel
 - ecossistema
+- familyCode
+- familyLabel
 - origemInventario
 - origemDetalhe
-- tipoCertificado
+- typeCode
+- typeLabel
+- typeDescription
 - categoria
 - numeroSerie
 - fingerprint
@@ -84,6 +90,21 @@
 - SAN
 - IDENTIFICACAO
 - INTERNO
+
+## Taxonomia de certificados
+
+### Raiz Internacional
+
+- SSL
+- S/MIME
+
+### ICP-Brasil
+
+- Aplicacao
+- Infoconv
+- Bancario
+  - CIP
+  - COMPE-SPB-Bacen
 
 ## Tipos de ativo
 

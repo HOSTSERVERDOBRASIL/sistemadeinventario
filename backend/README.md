@@ -49,6 +49,8 @@ Esta base ja foi iniciada com:
 - whitelist de jobs por tipo de agente
 - assinatura HMAC dos jobs enviados ao agente
 - validacao de zona e escopo antes de aceitar `report`
+- catalogo oficial de certificados com Raiz Internacional e ICP-Brasil
+- reconhecimento por upload de `.crt`, `.cer`, `.pem`, `.p7b` e `.p7c`
 
 ## Como executar
 

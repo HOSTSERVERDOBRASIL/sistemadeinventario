@@ -1,6 +1,12 @@
+const { CERTIFICATE_CATALOG, findCatalogEntry } = require("../data/certificateCatalog");
+
 class InventoryService {
   constructor(repository) {
     this.repository = repository;
+  }
+
+  getCertificateCatalog() {
+    return CERTIFICATE_CATALOG;
   }
 
   dashboard(companyId) {
@@ -29,8 +35,30 @@ class InventoryService {
     return this.listCertificates(companyId).find((item) => item.id === certificateId) || null;
   }
 
+  normalizeCertificatePayload(payload) {
+    const rootCode = payload.rootCode || payload.ecosystem || "INTERNACIONAL";
+    const familyCode = payload.familyCode || payload.category || "SSL";
+    const typeCode = payload.typeCode || payload.certificateTypeCode || `${familyCode}_STANDARD`;
+    const catalogEntry = findCatalogEntry(rootCode, familyCode, typeCode);
+
+    if (!catalogEntry) {
+      throw new Error("Invalid certificate taxonomy. Use rootCode, familyCode and typeCode from the catalog.");
+    }
+
+    return {
+      rootCode: catalogEntry.rootCode,
+      rootLabel: catalogEntry.rootLabel,
+      familyCode: catalogEntry.familyCode,
+      familyLabel: catalogEntry.familyLabel,
+      typeCode: catalogEntry.typeCode,
+      typeLabel: catalogEntry.typeLabel,
+      typeDescription: catalogEntry.description
+    };
+  }
+
   createCertificate(companyId, payload) {
     const state = this.repository.getState();
+    const taxonomy = this.normalizeCertificatePayload(payload);
     const created = {
       id: this.repository.nextId("cert"),
       companyId,
@@ -40,8 +68,15 @@ class InventoryService {
       coverageDomains: payload.coverageDomains || [],
       sanDomains: payload.sanDomains || [],
       source: payload.source || "XDB",
-      ecosystem: payload.ecosystem || "INTERNACIONAL",
-      category: payload.category || "SSL",
+      ecosystem: taxonomy.rootCode,
+      category: taxonomy.familyCode,
+      rootCode: taxonomy.rootCode,
+      rootLabel: taxonomy.rootLabel,
+      familyCode: taxonomy.familyCode,
+      familyLabel: taxonomy.familyLabel,
+      typeCode: taxonomy.typeCode,
+      typeLabel: taxonomy.typeLabel,
+      typeDescription: taxonomy.typeDescription,
       issuer: payload.issuer || "unknown",
       validFrom: payload.validFrom || new Date().toISOString(),
       validTo: payload.validTo || new Date().toISOString(),
@@ -61,7 +96,31 @@ class InventoryService {
       return null;
     }
 
+    const shouldRebuildTaxonomy = payload.rootCode || payload.familyCode || payload.typeCode || payload.ecosystem || payload.category;
+    const taxonomy = shouldRebuildTaxonomy
+      ? this.normalizeCertificatePayload({
+          rootCode: payload.rootCode || certificate.rootCode || certificate.ecosystem,
+          familyCode: payload.familyCode || certificate.familyCode || certificate.category,
+          typeCode: payload.typeCode || certificate.typeCode
+        })
+      : null;
+
     Object.assign(certificate, payload);
+
+    if (taxonomy) {
+      Object.assign(certificate, {
+        ecosystem: taxonomy.rootCode,
+        category: taxonomy.familyCode,
+        rootCode: taxonomy.rootCode,
+        rootLabel: taxonomy.rootLabel,
+        familyCode: taxonomy.familyCode,
+        familyLabel: taxonomy.familyLabel,
+        typeCode: taxonomy.typeCode,
+        typeLabel: taxonomy.typeLabel,
+        typeDescription: taxonomy.typeDescription
+      });
+    }
+
     this.repository.save();
     return certificate;
   }

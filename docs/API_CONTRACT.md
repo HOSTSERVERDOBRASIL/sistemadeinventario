@@ -21,9 +21,48 @@ Retorna:
 
 ## Certificates
 
+### GET /api/v2/inventario/catalogo/certificados
+
+Retorna a arvore oficial de selecao de certificados:
+
+- Raiz Internacional
+  - SSL
+  - S/MIME
+- ICP-Brasil
+  - Aplicacao
+  - Infoconv
+  - Bancario
+    - CIP
+    - COMPE-SPB-Bacen
+
 ### GET /api/v2/inventario-certificados
 
 Lista paginada.
+
+### POST /api/v2/inventario-certificados/analisar-upload
+
+Recebe:
+
+- `filename`
+- `contentBase64`
+
+Reconhece formatos como:
+
+- `.crt`
+- `.cer`
+- `.pem`
+- `.p7b`
+- `.p7c`
+
+Retorna:
+
+- formato detectado
+- metadados do certificado quando possivel
+- taxonomia sugerida
+
+### POST /api/v2/inventario-certificados/importar-upload
+
+Analisa o upload e ja cria o certificado no inventario com a taxonomia sugerida ou informada.
 
 ### GET /api/v2/inventario-certificados/:id
 

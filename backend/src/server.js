@@ -38,9 +38,32 @@ const routes = [
   },
   {
     method: "GET",
+    path: "/api/v2/inventario/catalogo/certificados",
+    handler: withErrorHandling(async (_req, res) => {
+      sendJson(res, 200, container.inventoryService.getCertificateCatalog());
+    })
+  },
+  {
+    method: "GET",
     path: "/api/v2/inventario-certificados",
     handler: withErrorHandling(async (_req, res) => {
       sendJson(res, 200, container.inventoryService.listCertificates(companyId));
+    })
+  },
+  {
+    method: "POST",
+    path: "/api/v2/inventario-certificados/analisar-upload",
+    handler: withErrorHandling(async (req, res) => {
+      const body = await parseBody(req);
+      sendJson(res, 200, container.certificateImportService.analyzeUpload(body));
+    })
+  },
+  {
+    method: "POST",
+    path: "/api/v2/inventario-certificados/importar-upload",
+    handler: withErrorHandling(async (req, res) => {
+      const body = await parseBody(req);
+      sendJson(res, 201, container.certificateImportService.importUpload(companyId, body));
     })
   },
   {
