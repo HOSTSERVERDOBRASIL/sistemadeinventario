@@ -1,6 +1,7 @@
 const http = require("http");
+const path = require("path");
 const { createContainer } = require("./bootstrap");
-const { sendJson, notFound, parseBody, parseRequestUrl, matchPath } = require("./lib/http");
+const { sendJson, notFound, parseBody, parseMultipartForm, parseRequestUrl, matchPath, sendFile } = require("./lib/http");
 
 const container = createContainer();
 const companyId = container.config.companyId;
@@ -18,6 +19,20 @@ function withErrorHandling(handler) {
 }
 
 const routes = [
+  {
+    method: "GET",
+    path: "/app",
+    handler: withErrorHandling(async (_req, res) => {
+      sendFile(res, path.join(container.config.frontendPublicDir, "index.html"));
+    })
+  },
+  {
+    method: "GET",
+    path: "/app/:asset",
+    handler: withErrorHandling(async (_req, res, params) => {
+      sendFile(res, path.join(container.config.frontendPublicDir, params.asset));
+    })
+  },
   {
     method: "GET",
     path: "/health",
@@ -64,6 +79,40 @@ const routes = [
     handler: withErrorHandling(async (req, res) => {
       const body = await parseBody(req);
       sendJson(res, 201, container.certificateImportService.importUpload(companyId, body));
+    })
+  },
+  {
+    method: "POST",
+    path: "/api/v2/inventario-certificados/upload-multipart",
+    handler: withErrorHandling(async (req, res) => {
+      const form = await parseMultipartForm(req);
+      const file = form.files.file;
+
+      if (!file) {
+        sendJson(res, 400, { error: "Field 'file' is required" });
+        return;
+      }
+
+      const payload = {
+        filename: file.filename,
+        contentBase64: file.base64,
+        name: form.fields.name || "",
+        source: form.fields.source || "EXTERNO",
+        rootCode: form.fields.rootCode || "",
+        familyCode: form.fields.familyCode || "",
+        typeCode: form.fields.typeCode || "",
+        coverageType: form.fields.coverageType || "IDENTIFICACAO",
+        domainPrimary: form.fields.domainPrimary || ""
+      };
+
+      const mode = (form.fields.mode || "analyze").toLowerCase();
+
+      if (mode === "import") {
+        sendJson(res, 201, container.certificateImportService.importUpload(companyId, payload));
+        return;
+      }
+
+      sendJson(res, 200, container.certificateImportService.analyzeUpload(payload));
     })
   },
   {
@@ -317,6 +366,10 @@ const routes = [
 
 async function requestHandler(req, res) {
   const url = parseRequestUrl(req);
+  if (req.method === "GET" && url.pathname === "/") {
+    sendFile(res, path.join(container.config.frontendPublicDir, "index.html"));
+    return;
+  }
   const route = routes.find((item) => item.method === req.method && matchPath(url.pathname, item.path));
 
   if (!route) {

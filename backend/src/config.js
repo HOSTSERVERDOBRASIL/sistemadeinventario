@@ -5,6 +5,7 @@ const rootDir = path.resolve(__dirname, "..");
 module.exports = {
   port: Number(process.env.PORT || 4010),
   dataFile: process.env.INVENTARIO_DATA_FILE || path.join(rootDir, "data", "inventory-db.json"),
+  frontendPublicDir: process.env.INVENTARIO_FRONTEND_PUBLIC_DIR || path.resolve(rootDir, "..", "frontend", "public"),
   apiToken: process.env.INVENTARIO_API_TOKEN || "local-inventory-token",
   jobSigningSecret: process.env.INVENTARIO_JOB_SIGNING_SECRET || "local-job-signing-secret",
   notificationWebhook: process.env.INVENTARIO_NOTIFICATION_WEBHOOK || "",

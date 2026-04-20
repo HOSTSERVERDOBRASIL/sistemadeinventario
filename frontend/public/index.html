@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inventário Atlas</title>
+    <link rel="stylesheet" href="/app/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Inventário Atlas</p>
+          <h1>Cadastro e reconhecimento seguro de certificados</h1>
+          <p class="lede">
+            Faça upload de `.crt`, `.cer`, `.pem`, `.p7b` ou `.p7c`, deixe o sistema sugerir a classificação
+            correta e importe para o inventário sem expor a rede do cliente.
+          </p>
+        </div>
+        <div class="hero-card">
+          <div class="metric">
+            <span id="catalogRoots">0</span>
+            <small>raízes carregadas</small>
+          </div>
+          <div class="metric">
+            <span id="catalogTypes">0</span>
+            <small>tipos catalogados</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Catálogo oficial</h2>
+          <div id="catalog" class="catalog"></div>
+        </article>
+
+        <article class="card">
+          <h2>Upload e classificação</h2>
+          <form id="uploadForm" class="form">
+            <label>
+              Arquivo do certificado
+              <input name="file" type="file" accept=".crt,.cer,.pem,.p7b,.p7c" required />
+            </label>
+
+            <label>
+              Nome manual opcional
+              <input name="name" type="text" placeholder="Ex.: Certificado CIP Cliente XPTO" />
+            </label>
+
+            <label>
+              Modo
+              <select name="mode">
+                <option value="analyze">Somente analisar</option>
+                <option value="import">Analisar e importar</option>
+              </select>
+            </label>
+
+            <label>
+              Origem
+              <select name="source">
+                <option value="EXTERNO">Externo</option>
+                <option value="XDB">XDB</option>
+              </select>
+            </label>
+
+            <label>
+              Tipo de cobertura
+              <select name="coverageType">
+                <option value="IDENTIFICACAO">Identificação</option>
+                <option value="SINGLE">Single</option>
+                <option value="WILDCARD">Wildcard</option>
+                <option value="SAN">SAN</option>
+              </select>
+            </label>
+
+            <button type="submit">Processar certificado</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="card">
+        <h2>Resultado</h2>
+        <pre id="result">Aguardando upload...</pre>
+      </section>
+    </main>
+
+    <script src="/app/app.js"></script>
+  </body>
+  </html>
