@@ -50,7 +50,9 @@ Entregar um modulo unificado para:
 - `docs/DOMAIN_MODEL.md`
 - `docs/OPERACAO_DIARIA.md`
 - `docs/SECURITY_MODEL.md`
+- `docs/INTEGRACAO_REAL.md`
 - `planning/SPRINT_1_BACKLOG.md`
+- `planning/IMPLEMENTATION_ROADMAP.md`
 
 ## Automacao diaria
 

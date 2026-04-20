@@ -77,3 +77,13 @@ Documento de referencia:
 - agentes internos
 - automacao ampliada
 
+## Integracao real
+
+Documento de execucao:
+
+- `docs/INTEGRACAO_REAL.md`
+
+Roadmap por sprint:
+
+- `planning/IMPLEMENTATION_ROADMAP.md`
+
