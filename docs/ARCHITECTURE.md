@@ -26,6 +26,7 @@ Responsavel por:
 - cobertura
 - recomendacao
 - integracao com Atlas
+- orquestracao segura de jobs
 
 ### Shared
 
@@ -46,6 +47,18 @@ Responsavel por:
 
 - inicialmente atras do backend principal
 - opcionalmente desacoplado com proxy
+
+## Estrategia de seguranca
+
+- Atlas nao acessa diretamente a rede interna do cliente
+- coleta interna via agente `outbound only`
+- worker externo somente para superficie publica
+- jobs limitados por whitelist e por zona
+- sem shell remoto generico
+
+Documento de referencia:
+
+- `docs/SECURITY_MODEL.md`
 
 ## Fases
 

@@ -30,6 +30,7 @@ O modulo consolida:
 - visibilidade operacional
 - melhor uso dos certificados emitidos
 - suporte a upsell de implantacao e monitoramento
+- visibilidade sem exposicao da rede interna
 
 ## Personas
 
@@ -47,4 +48,5 @@ O modulo consolida:
 - discovery por dominio
 - cobertura de certificado
 - fila de implantacao
+- modelo de coleta segura por agente outbound
 

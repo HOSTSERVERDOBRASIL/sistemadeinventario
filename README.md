@@ -49,6 +49,7 @@ Entregar um modulo unificado para:
 - `docs/API_CONTRACT.md`
 - `docs/DOMAIN_MODEL.md`
 - `docs/OPERACAO_DIARIA.md`
+- `docs/SECURITY_MODEL.md`
 - `planning/SPRINT_1_BACKLOG.md`
 
 ## Automacao diaria
@@ -59,6 +60,22 @@ O template ja inclui a base para execucao automatica diaria do inventario:
 - `docs/OPERACAO_DIARIA.md`
 
 Esse fluxo foi pensado para rodar discovery, recalcular cobertura e enviar um resumo diario para o time.
+
+## Seguranca
+
+O projeto foi desenhado para trazer informacao sem expor a rede interna do cliente.
+
+Base do modelo:
+
+- Atlas orquestra
+- worker externo observa superficie publica
+- agente interno opera somente em `outbound`
+- sem acesso remoto generico
+- sem shell arbitrario
+
+Referencia:
+
+- `docs/SECURITY_MODEL.md`
 
 ## Proxima etapa
 
